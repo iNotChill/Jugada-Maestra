@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { communityPhotos, stats } from '@/data/site'
 import { useReducedMotion } from '@/hooks/useMediaQuery'
+import { asset } from '@/lib/asset'
 import { gsap } from '@/lib/gsap'
 import { MaskedLines } from './ui/MaskedLines'
 import { Reveal } from './ui/Reveal'
@@ -82,7 +83,7 @@ export function Community() {
                   className="relative size-full overflow-hidden rounded-2xl bg-ink/10 will-change-transform"
                 >
                   <img
-                    src={photo.src}
+                    src={asset(photo.src)}
                     alt={photo.alt}
                     loading="lazy"
                     decoding="async"

@@ -24,6 +24,10 @@ Tipografía enorme, piezas 3D flotando y scroll como parte del relato.
 
 <br>
 
+### [**→ VER EL SITIO EN VIVO ←**](https://inotchill.github.io/Jugada-Maestra/)
+
+<br>
+
 <img src="docs/preview-hero.jpg" alt="Hero de Jugada Maestra: titular JUEGA. CONOCE. COMPITE. con piezas de juegos de mesa en 3D flotando" width="100%">
 
 </div>
@@ -216,6 +220,27 @@ Cada una tiene un porqué. Ninguna está de adorno:
   se genera en escena: **no se descarga ningún HDR ni modelo externo**.
 - Las cintas infinitas son CSS puro, sin coste por frame.
 - Imágenes con `loading="lazy"` y `decoding="async"`.
+
+<br>
+
+## 🚢 Despliegue
+
+El sitio se publica solo: cada push a `main` dispara
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), que compila y
+sube **únicamente `dist/`** a GitHub Pages.
+
+> [!IMPORTANT]
+> En **Settings → Pages → Build and deployment**, la fuente tiene que ser
+> **GitHub Actions**, no *Deploy from a branch*.
+>
+> Apuntar Pages a la rama tal cual sirve el `index.html` del código fuente —el
+> que carga `/src/main.tsx`— y el navegador se queda **en blanco**, porque
+> GitHub no compila proyectos de Vite.
+
+Como Pages publica en un subdirectorio (`/Jugada-Maestra/`), el build lleva
+`base` en [`vite.config.ts`](vite.config.ts) y todas las imágenes de `public/`
+pasan por el helper [`asset()`](src/lib/asset.ts). Con un dominio propio, basta
+con dejar `PROD_BASE` en `'/'`.
 
 <br>
 

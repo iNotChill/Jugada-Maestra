@@ -1,4 +1,5 @@
 import { accentVar } from '@/data/games'
+import { asset } from '@/lib/asset'
 import { formatDuration, formatPlayers, type Game } from '@/types/game'
 
 interface GameCardProps {
@@ -94,7 +95,7 @@ export function GameCard({ game, index, layout, active, onOpen, onHover, onLeave
       >
         <span className="relative block aspect-4/5 w-full overflow-hidden rounded-2xl bg-ink/40">
           <img
-            src={game.image}
+            src={asset(game.image)}
             alt=""
             loading="lazy"
             decoding="async"

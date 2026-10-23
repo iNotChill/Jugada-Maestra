@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { accentVar, gameCategories, games } from '@/data/games'
 import { useFinePointer, useReducedMotion } from '@/hooks/useMediaQuery'
+import { asset } from '@/lib/asset'
 import { gsap } from '@/lib/gsap'
 import type { Game, GameCategory } from '@/types/game'
 import { GameCard } from './GameCard'
@@ -200,7 +201,7 @@ export function GameExplorer() {
           {games.map((g) => (
             <img
               key={g.id}
-              src={g.image}
+              src={asset(g.image)}
               alt=""
               loading="lazy"
               decoding="async"

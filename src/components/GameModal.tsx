@@ -3,6 +3,7 @@ import { accentVar } from '@/data/games'
 import { site } from '@/data/site'
 import { useReducedMotion } from '@/hooks/useMediaQuery'
 import { lockScroll } from '@/hooks/useSmoothScroll'
+import { asset } from '@/lib/asset'
 import { gsap } from '@/lib/gsap'
 import { formatDuration, formatPlayers, type Game } from '@/types/game'
 import { ActionButton } from './ui/ActionButton'
@@ -115,7 +116,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
             <div className="aspect-16/9 w-full overflow-hidden lg:h-full lg:aspect-auto">
               <img
                 data-modal-media
-                src={game.image}
+                src={asset(game.image)}
                 alt={`Arte de ${game.name}`}
                 className="size-full object-cover will-change-transform"
               />

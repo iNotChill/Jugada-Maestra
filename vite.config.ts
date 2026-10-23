@@ -3,7 +3,20 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-export default defineConfig({
+/**
+ * El sitio publicado vive en https://inotchill.github.io/Jugada-Maestra/, es
+ * decir en un subdirectorio, no en la raiz del dominio. Por eso el build lleva
+ * `base`: sin el, el HTML pediria /assets/... y GitHub devolveria 404 (pagina
+ * en blanco).
+ *
+ * En desarrollo se queda en '/' para no tener que escribir el subpath a mano.
+ *
+ * Si algun dia se usa un dominio propio, basta con dejar PROD_BASE en '/'.
+ */
+const PROD_BASE = '/Jugada-Maestra/'
+
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? PROD_BASE : '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -25,4 +38,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))
