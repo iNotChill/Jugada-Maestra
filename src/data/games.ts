@@ -83,20 +83,9 @@ export const games: Game[] = [
       'Ilustraciones oniricas y una frase ambigua. Si todos aciertan tu carta, no puntuas; si nadie acierta, tampoco. El juego premia la medida exacta de misterio y descubre como piensan tus amigos.',
     accent: 'cobalt',
   },
-  {
-    id: 'jaipur',
-    name: 'Jaipur',
-    tagline: 'Duelo de mercaderes, puro pulso.',
-    image: '/images/games/jaipur.svg',
-    players: { min: 2, max: 2 },
-    duration: { min: 20, max: 30 },
-    difficulty: 'Facil',
-    categories: ['Cartas', 'Competitivo'],
-    description:
-      'Solo para dos. Compras especias, acumulas camellos y decides cuando vender para quedarte con las fichas mas valiosas. Rapido, tenso y adictivo: casi nunca se juega una sola partida.',
-    accent: 'ember',
-    tip: 'Ideal si llegas solo y buscas con quien jugar.',
-  },
+  /* Jaipur esta fuera del catalogo hasta tener su fotografia.
+     Para recuperarlo: deja su foto en public/images/games/jaipur.webp y
+     vuelve a anadir su objeto (esta en el historial de git). */
   {
     id: 'hanabi',
     name: 'Hanabi',

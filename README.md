@@ -247,13 +247,20 @@ con dejar `PROD_BASE` en `'/'`.
 ## 📝 Pendiente
 
 - [ ] Cambiar `site.joinUrl` por el enlace real de inscripción (hoy apunta a `#sumarse`)
-- [ ] Reemplazar los placeholders de `public/images/` por fotos reales
-      — instrucciones en [`public/images/README.md`](public/images/README.md)
 - [ ] Actualizar `site.instagram`
+- [ ] **Jaipur**: falta su fotografía, así que el juego está fuera del catálogo.
+      Deja `jaipur.webp` en `public/images/games/` y recupera su objeto en
+      [`src/data/games.ts`](src/data/games.ts) (está en el historial de git)
+- [ ] `og-image.jpg` (1200 × 630): la miniatura al compartir el enlace. Sin ella,
+      pegar la URL en WhatsApp o Instagram no muestra imagen
+- [ ] `apple-touch-icon.png` (180 × 180), para la pantalla de inicio en móvil
 
-> Todo lo que hay en `public/images/` es arte **generado localmente** y lleva una
-> etiqueta visible `PLACEHOLDER / REEMPLAZAR`, para que no se escape a producción
-> por error.
+- [x] ~~Fotografías del catálogo y de comunidad~~ — 13 fotos en WebP
+
+> Las fotos reales ya están en `public/images/`. Quedan ahí los SVG generados
+> como respaldo; `npm run art` los regenera y
+> [`public/images/README.md`](public/images/README.md) explica el formato que
+> espera cada hueco.
 
 <br>
 

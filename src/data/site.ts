@@ -1,3 +1,5 @@
+import { games } from '@/data/games'
+
 /* ===========================================================================
    DATOS DEL GRUPO
    Todo el contenido editable del sitio (horario, sede, enlaces, pasos y
@@ -74,8 +76,10 @@ export const communityPhotos: CommunityPhoto[] = [
   { src: '/images/community/comunidad-04.webp', alt: 'Grupo celebrando el final de una partida', caption: 'Revancha pedida' },
 ]
 
+/* La cifra sale del propio catalogo: al anadir o quitar un juego en
+   games.ts se actualiza sola y nunca queda desfasada. */
 export const stats = [
-  { value: '10+', label: 'Juegos en el catalogo' },
+  { value: `${games.length}`, label: 'Juegos en el catalogo' },
   { value: '2 h', label: 'Cada viernes' },
   { value: '0', label: 'Experiencia requerida' },
-] as const
+]
