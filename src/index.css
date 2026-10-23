@@ -1,0 +1,260 @@
+@import 'tailwindcss';
+
+@import '@fontsource/anton/400.css';
+@import '@fontsource-variable/space-grotesk/index.css';
+
+/* ===========================================================================
+   SISTEMA VISUAL — Jugada Maestra
+   Paleta: crema/marfil de base, tinta e indigo oscuro para texto,
+   bermellon como color de accion, amarillo como acento,
+   azul y verde solo como detalles puntuales.
+   =========================================================================== */
+@theme {
+  --color-cream: #f2ebdd;
+  --color-bone: #e4d9c4;
+  --color-paper: #fbf7ef;
+  --color-ink: #101319;
+  --color-navy: #0c1a2b;
+  --color-ember: #e0472a;
+  --color-flare: #f0792b;
+  --color-gold: #f2b01e;
+  --color-cobalt: #2b5bd7;
+  --color-pine: #1f6b4f;
+
+  --font-display: 'Anton', 'Arial Narrow', sans-serif;
+  --font-sans: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+/* --------------------------------------------------------------------------
+   BASE
+   -------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    --nav-ink: var(--color-ink);
+    --nav-contrast: var(--color-cream);
+    color-scheme: light;
+  }
+
+  * {
+    min-width: 0;
+  }
+
+  html {
+    /* El scroll suave lo maneja Lenis; sin JS se degrada al nativo */
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    /* Barrera contra overflow horizontal accidental de los elementos
+       que salen parcialmente de pantalla */
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Lenis */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  html.lenis {
+    scroll-behavior: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: clip;
+  }
+
+  ::selection {
+    background-color: var(--color-ember);
+    color: var(--color-cream);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  img,
+  svg,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  /* Oculta el cursor nativo solo cuando el cursor propio esta activo
+     (puntero fino + sin preferencia de movimiento reducido).
+     Ojo: el hook va en `data-cursor-mode`, nunca en `data-cursor`, que se
+     reserva para las etiquetas que lee el propio cursor. */
+  html[data-cursor-mode='custom'] body,
+  html[data-cursor-mode='custom'] body * {
+    cursor: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   TIPOGRAFIA FLUIDA
+   -------------------------------------------------------------------------- */
+@utility type-hero {
+  font-family: var(--font-display);
+  /* El limite por altura evita que el titular aplaste al resto del hero
+     en pantallas bajas (portatiles de 13" o movil apaisado) */
+  font-size: clamp(3.4rem, min(12vw, 18svh), 13.5rem);
+  line-height: 0.82;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+@utility type-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 7.4vw, 8.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+}
+
+@utility type-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4.2vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+@utility type-mono {
+  font-family: var(--font-sans);
+  font-size: clamp(0.66rem, 0.82vw, 0.78rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+@utility type-body {
+  font-size: clamp(1rem, 1.15vw, 1.2rem);
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+@utility type-lead {
+  font-size: clamp(1.15rem, 1.9vw, 1.75rem);
+  line-height: 1.38;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* --------------------------------------------------------------------------
+   UTILIDADES DE COMPOSICION
+   -------------------------------------------------------------------------- */
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 108rem;
+  padding-inline: clamp(1rem, 4vw, 4.5rem);
+}
+
+/* Mascara de entrada para revelados de texto linea a linea */
+@utility line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+@utility grain {
+  position: relative;
+}
+
+/* Carruseles: se desliza con gesto o rueda, sin barra visible */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+@utility grain-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   ANIMACIONES
+   -------------------------------------------------------------------------- */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) rotate(3deg);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.animate-marquee {
+  animation: marquee-x 28s linear infinite;
+}
+.animate-float {
+  animation: float-soft 7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee,
+  .animate-float {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
