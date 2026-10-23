@@ -63,17 +63,15 @@ export const steps: Step[] = [
 export interface CommunityPhoto {
   src: string
   alt: string
-  /** Etiqueta visible: deja claro que es material temporal */
+  /** Pie visible sobre la foto */
   caption: string
 }
 
-/** TODO: reemplazar estos SVG por fotografias reales del grupo.
- *  Ver instrucciones en public/images/README.md */
 export const communityPhotos: CommunityPhoto[] = [
-  { src: '/images/community/comunidad-01.svg', alt: 'Mesa de juego en una reunion del grupo', caption: 'Mesa de los viernes' },
-  { src: '/images/community/comunidad-02.svg', alt: 'Jugadores alrededor de un tablero', caption: 'Primera partida' },
-  { src: '/images/community/comunidad-03.svg', alt: 'Detalle de fichas y losetas sobre la mesa', caption: 'Catalogo abierto' },
-  { src: '/images/community/comunidad-04.svg', alt: 'Grupo celebrando el final de una partida', caption: 'Revancha pedida' },
+  { src: '/images/community/comunidad-01.webp', alt: 'Mesa de juego en una reunion del grupo', caption: 'Mesa de los viernes' },
+  { src: '/images/community/comunidad-02.webp', alt: 'Jugadores alrededor de un tablero', caption: 'Primera partida' },
+  { src: '/images/community/comunidad-03.webp', alt: 'Detalle de fichas y losetas sobre la mesa', caption: 'Catalogo abierto' },
+  { src: '/images/community/comunidad-04.webp', alt: 'Grupo celebrando el final de una partida', caption: 'Revancha pedida' },
 ]
 
 export const stats = [
