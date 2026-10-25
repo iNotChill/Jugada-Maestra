@@ -33,9 +33,12 @@ const OUT = resolve(root, 'public/models')
  * texture : lado maximo en px
  */
 const MODELS = [
-  // El dibujo de la carta va en COLOR_0, un color por vertice: al simplificar
-  // de mas se pixela, asi que aqui se conserva bastante malla a proposito.
-  { file: 'card.glb', ratio: 0.35, error: 0.001, texture: 1024, nota: 'el dibujo va en colores por vertice' },
+  // La carta NO se simplifica. Su dibujo va en COLOR_0 (un color por vertice),
+  // asi que cada vertice que se quita es dibujo que se pierde, y en los angulos
+  // rasantes los triangulos se estiran y se ven las facetas. Comprimida con
+  // meshopt cabe entera en 886 KB frente a los 15,2 MB del original: el peso
+  // estaba en los datos sin comprimir, no en la malla.
+  { file: 'card.glb', simplify: false, texture: 1024, nota: 'malla intacta: el dibujo va por vertice' },
   { file: 'pawn.glb', ratio: 0.25, texture: 512, nota: 'revolucion, aguanta poca malla' },
   { file: 'd20.glb', ratio: 0.4, texture: 512, nota: 'las aristas definen la pieza' },
   { file: 'die.glb', ratio: 0.5, texture: 512, nota: 'ya venia ligero' },
@@ -53,7 +56,7 @@ mkdirSync(OUT, { recursive: true })
 let antes = 0
 let despues = 0
 
-for (const { file, ratio, error = 0.005, texture, nota } of MODELS) {
+for (const { file, ratio, error = 0.005, simplify = true, texture, nota } of MODELS) {
   const src = resolve(SRC, file)
   const out = resolve(OUT, file)
 
@@ -71,9 +74,8 @@ for (const { file, ratio, error = 0.005, texture, nota } of MODELS) {
       // meshopt y no draco: su decodificador viene dentro de three, asi que no
       // hay que descargar nada de un CDN externo
       '--compress', 'meshopt',
-      '--simplify', 'true',
-      '--simplify-ratio', String(ratio),
-      '--simplify-error', String(error),
+      '--simplify', String(simplify),
+      ...(simplify ? ['--simplify-ratio', String(ratio), '--simplify-error', String(error)] : []),
       // El meeple llega partido en 7 mallas: sin unirlas, cada corte cuenta
       // como borde de la topologia y el simplificador no puede tocarlas
       '--join', 'true',
