@@ -75,7 +75,7 @@ La información no se presenta: **se descubre mientras haces scroll.**
 
 | | |
 | :-- | :-- |
-| 🎲 **Hero en 3D** | D20, dados, carta, peón y fichas flotando, con parallax de cursor y deriva por scroll. Modelos reales optimizados a **316 KB en total** |
+| 🎲 **Hero en 3D** | D20, dados, carta, peón y fichas flotando, con parallax de cursor y deriva por scroll. Modelos reales optimizados a **551 KB en total** |
 | 🃏 **Catálogo interactivo** | Índice editorial en desktop con lámina que sigue al cursor; carrusel con snap en móvil. Filtros por categoría derivados de los datos |
 | 📖 **Relato con pin** | "Cómo funciona" fija la sección y cambia de escena en cada etapa mientras haces scroll |
 | 🎨 **Sistema visual propio** | Crema y marfil de base, bermellón como acción, amarillo de acento. Dos familias tipográficas, ni una más |
@@ -218,7 +218,7 @@ Cada una tiene un porqué. Ninguna está de adorno:
   (`IntersectionObserver` → `frameloop="never"`).
 - Los modelos venían de escaneo, con hasta 438.000 triángulos para piezas que
   en pantalla ocupan 100 px: `npm run models` los simplifica y comprime con
-  meshopt, de **28,5 MB a 316 KB** (99% menos). El decodificador de meshopt va
+  meshopt, de **17 MB a 551 KB** (97% menos). El decodificador de meshopt va
   dentro de three, así que no se descarga nada de un CDN.
 - El mapa de entorno que da el reflejo metálico se genera en la propia escena:
   **no se descarga ningún HDR**.

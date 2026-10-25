@@ -33,7 +33,9 @@ const OUT = resolve(root, 'public/models')
  * texture : lado maximo en px
  */
 const MODELS = [
-  { file: 'card.glb', ratio: 0.12, error: 0.01, texture: 1024, nota: 'el dibujo va en colores por vertice' },
+  // El dibujo de la carta va en COLOR_0, un color por vertice: al simplificar
+  // de mas se pixela, asi que aqui se conserva bastante malla a proposito.
+  { file: 'card.glb', ratio: 0.35, error: 0.001, texture: 1024, nota: 'el dibujo va en colores por vertice' },
   { file: 'pawn.glb', ratio: 0.25, texture: 512, nota: 'revolucion, aguanta poca malla' },
   { file: 'd20.glb', ratio: 0.4, texture: 512, nota: 'las aristas definen la pieza' },
   { file: 'die.glb', ratio: 0.5, texture: 512, nota: 'ya venia ligero' },

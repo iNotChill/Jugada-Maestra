@@ -27,17 +27,33 @@ export function Hero() {
     return () => window.clearTimeout(id)
   }, [reduced])
 
-  /* Pausa el canvas cuando el hero deja de verse */
+  /**
+   * Pausa el canvas cuando el hero deja de verse.
+   *
+   * La visibilidad se recalcula siempre desde la posicion real del elemento,
+   * no desde `entry.isIntersecting`: al redimensionar la ventana el observer
+   * puede informar de que no interseca y no volver a dispararse nunca, con lo
+   * que el canvas se quedaba congelado hasta que el usuario salia de la
+   * seccion y volvia.
+   */
   useEffect(() => {
     const el = section.current
     if (!el) return
 
-    const io = new IntersectionObserver(
-      ([entry]) => setHeroVisible(entry.isIntersecting),
-      { rootMargin: '120px' },
-    )
+    const MARGIN = 120
+    const check = () => {
+      const r = el.getBoundingClientRect()
+      setHeroVisible(r.bottom > -MARGIN && r.top < window.innerHeight + MARGIN)
+    }
+
+    const io = new IntersectionObserver(check, { rootMargin: `${MARGIN}px` })
     io.observe(el)
-    return () => io.disconnect()
+    window.addEventListener('resize', check)
+
+    return () => {
+      io.disconnect()
+      window.removeEventListener('resize', check)
+    }
   }, [])
 
   useEffect(() => {

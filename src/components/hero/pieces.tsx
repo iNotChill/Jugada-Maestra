@@ -32,28 +32,40 @@ const MODELS = {
  * sin normalizar habria que ajustar cada pieza a mano.
  */
 interface ModelOptions {
-  /** Recolorea la pieza con un color de la paleta. Solo para los modelos que
-   *  vienen con color plano, sin textura. */
-  tint?: string
+  /** Recolorea la pieza. Solo para los modelos que vienen con color plano, sin
+   *  textura: un color para toda la pieza, o uno por nombre de material
+   *  (para no perder detalles como los puntos del dado). */
+  tint?: string | Record<string, string>
+  /** Acabado. Varios modelos vienen con metalness 1, que sin un entorno muy
+   *  reflectante los apaga y los deja casi negros. */
+  finish?: { metalness?: number; roughness?: number }
 }
 
-function useNormalizedModel(url: string, size: number, { tint }: ModelOptions = {}) {
+function useNormalizedModel(url: string, size: number, { tint, finish }: ModelOptions = {}) {
   const { scene } = useGLTF(asset(url))
 
   return useMemo(() => {
     const model = scene.clone(true)
 
-    if (tint) {
+    if (tint || finish) {
       model.traverse((o) => {
         const mesh = o as Mesh
         if (!mesh.isMesh || !mesh.visible) return
+
         // El material se clona: useGLTF cachea la escena original y clone()
         // comparte los materiales con ella
         const mat = (
           Array.isArray(mesh.material) ? mesh.material[0] : mesh.material
         ).clone() as MeshStandardMaterial
-        mat.color.set(tint)
-        mat.envMapIntensity = 1.4
+
+        const color = typeof tint === 'string' ? tint : tint?.[mat.name]
+        if (color) {
+          mat.color.set(color)
+          mat.envMapIntensity = 1.4
+        }
+        if (finish?.metalness !== undefined) mat.metalness = finish.metalness
+        if (finish?.roughness !== undefined) mat.roughness = finish.roughness
+
         mesh.material = mat
       })
     }
@@ -74,7 +86,7 @@ function useNormalizedModel(url: string, size: number, { tint }: ModelOptions = 
     model.position.set(-center.x * scale, -center.y * scale, -center.z * scale)
 
     return model
-  }, [scene, size, tint])
+  }, [scene, size, tint, finish])
 }
 
 interface FloatProps {
@@ -132,8 +144,16 @@ export function D20() {
   return <primitive object={useNormalizedModel(MODELS.d20, 2)} />
 }
 
+/* Venia en granate casi negro (#900000) y con metalness 1, que sin un entorno
+   muy reflectante lo apagaba del todo. Se aclara al rojo de la marca, en linea
+   con el D20, y se bajan metalness y rugosidad para que recoja la luz. */
+const DIE_FINISH = { metalness: 0.35, roughness: 0.3 }
+const DIE_TINT = { material: PALETTE.ember, Card_Back: PALETTE.cream }
+
 export function Die() {
-  return <primitive object={useNormalizedModel(MODELS.die, 1.5)} />
+  return (
+    <primitive object={useNormalizedModel(MODELS.die, 1.5, { tint: DIE_TINT, finish: DIE_FINISH })} />
+  )
 }
 
 export function Card() {
