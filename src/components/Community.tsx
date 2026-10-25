@@ -100,7 +100,10 @@ export function Community() {
         </div>
 
         {/* Cifras */}
-        <Reveal className="mt-20 grid gap-10 border-t border-ink/15 pt-10 sm:grid-cols-3 lg:mt-28" stagger={0.1}>
+        <Reveal
+          className="mt-20 grid gap-10 border-t border-ink/15 pt-10 sm:grid-cols-2 lg:mt-28 lg:grid-cols-4"
+          stagger={0.1}
+        >
           {stats.map((s) => (
             <div key={s.label}>
               <p className="font-display text-[clamp(2.8rem,6vw,5rem)] leading-[0.85]">{s.value}</p>

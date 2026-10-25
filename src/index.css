@@ -1,7 +1,44 @@
 @import 'tailwindcss';
 
-@import '@fontsource/anton/400.css';
 @import '@fontsource-variable/space-grotesk/index.css';
+
+/* ---------------------------------------------------------------------------
+   Anton se declara a mano en vez de importar '@fontsource/anton/400.css'
+   para poder controlar `font-display`.
+   Con el 'swap' que trae el paquete, los titulares se pintaban primero con la
+   tipografia de sistema —mucho mas fina y estrecha— y saltaban a Anton al
+   terminar la descarga: ese era el parpadeo de "letras delgadas" al entrar.
+   Con 'block' el texto espera (el archivo es local y pesa ~18 KB, asi que la
+   espera es imperceptible) y aparece ya con su peso definitivo.
+   Solo se cargan los subconjuntos latin y latin-ext, que cubren el espanol.
+   --------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src:
+    url('@fontsource/anton/files/anton-latin-400-normal.woff2') format('woff2'),
+    url('@fontsource/anton/files/anton-latin-400-normal.woff') format('woff');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src:
+    url('@fontsource/anton/files/anton-latin-ext-400-normal.woff2') format('woff2'),
+    url('@fontsource/anton/files/anton-latin-ext-400-normal.woff') format('woff');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+    U+2C60-2C7F, U+A720-A7FF;
+}
 
 /* ===========================================================================
    SISTEMA VISUAL — Jugada Maestra
@@ -82,6 +119,14 @@
     overflow: clip;
   }
 
+  /* Con una ficha de juego abierta, la barra superior se aparta: estorbaba
+     justo encima del boton de cerrar */
+  html[data-modal-open] header {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
   ::selection {
     background-color: var(--color-ember);
     color: var(--color-cream);
@@ -121,25 +166,25 @@
   font-family: var(--font-display);
   /* El limite por altura evita que el titular aplaste al resto del hero
      en pantallas bajas (portatiles de 13" o movil apaisado) */
-  font-size: clamp(3.4rem, min(12vw, 18svh), 13.5rem);
-  line-height: 0.82;
-  letter-spacing: -0.02em;
+  font-size: clamp(3.4rem, min(12vw, 17svh), 13.5rem);
+  line-height: 0.9;
+  letter-spacing: 0.012em;
   text-transform: uppercase;
 }
 
 @utility type-display {
   font-family: var(--font-display);
   font-size: clamp(2.6rem, 7.4vw, 8.5rem);
-  line-height: 0.86;
-  letter-spacing: -0.015em;
+  line-height: 0.92;
+  letter-spacing: 0.012em;
   text-transform: uppercase;
 }
 
 @utility type-title {
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 4.2vw, 4rem);
-  line-height: 0.95;
-  letter-spacing: -0.01em;
+  line-height: 1;
+  letter-spacing: 0.015em;
   text-transform: uppercase;
 }
 

@@ -80,6 +80,7 @@ export const communityPhotos: CommunityPhoto[] = [
    games.ts se actualiza sola y nunca queda desfasada. */
 export const stats = [
   { value: `${games.length}`, label: 'Juegos en el catalogo' },
+  { value: '3', label: 'Juegos por semana' },
   { value: '2 h', label: 'Cada viernes' },
   { value: '0', label: 'Experiencia requerida' },
 ]

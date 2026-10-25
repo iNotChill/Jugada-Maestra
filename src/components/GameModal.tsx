@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { accentVar } from '@/data/games'
 import { site } from '@/data/site'
 import { useReducedMotion } from '@/hooks/useMediaQuery'
@@ -26,6 +27,8 @@ export function GameModal({ game, onClose }: GameModalProps) {
 
     lastFocused.current = document.activeElement as HTMLElement
     lockScroll(true)
+    // La navegacion se aparta mientras la ficha esta abierta (ver index.css)
+    document.documentElement.dataset.modalOpen = 'true'
 
     const ctx = gsap.context(() => {
       if (reduced) {
@@ -45,6 +48,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
     return () => {
       ctx.revert()
       lockScroll(false)
+      delete document.documentElement.dataset.modalOpen
       lastFocused.current?.focus({ preventScroll: true })
     }
   }, [game, reduced])
@@ -91,7 +95,10 @@ export function GameModal({ game, onClose }: GameModalProps) {
     { label: 'Categoria', value: game.categories.join(' · ') },
   ]
 
-  return (
+  /* Se monta en <body> con un portal: la seccion del catalogo declara
+     `isolate`, que crea un contexto de apilamiento y encerraba el modal por
+     debajo de la barra de navegacion por mucho z-index que se le pusiera. */
+  return createPortal(
     <div
       ref={root}
       className="invisible fixed inset-0 z-[70] opacity-0"
@@ -188,6 +195,7 @@ export function GameModal({ game, onClose }: GameModalProps) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

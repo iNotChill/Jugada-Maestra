@@ -22,19 +22,20 @@ const variants: Record<Variant, string> = {
   light: 'bg-cream text-ink border-cream',
 }
 
-const fillColor: Record<Variant, string> = {
-  solid: 'var(--color-ink)',
-  ink: 'var(--color-ember)',
-  outline: 'var(--color-ink)',
-  light: 'var(--color-ember)',
+/* El barrido de relleno y el color del texto van en clases, NO en un tween de
+   GSAP: gsap.to(el, { color: 'var(--color-cream)' }) no sabe interpolar una
+   variable CSS como color y dejaba el texto ilegible al pasar el cursor. */
+const fillClass: Record<Variant, string> = {
+  solid: 'bg-ink',
+  ink: 'bg-ember',
+  outline: 'bg-ink',
+  light: 'bg-ember',
 }
 
-const fillText: Record<Variant, string> = {
-  solid: 'var(--color-cream)',
-  ink: 'var(--color-cream)',
-  outline: 'var(--color-cream)',
-  light: 'var(--color-cream)',
-}
+/* Color del texto mientras el relleno esta arriba. Solo se aplica con puntero
+   fino: en tactil el :hover se queda pegado tras el toque y dejaria, por
+   ejemplo, texto crema sobre fondo crema sin relleno detras. */
+const HOVER_TEXT = 'group-hover:text-cream'
 
 /**
  * Boton con dos microinteracciones: atraccion magnetica al cursor y
@@ -66,17 +67,11 @@ export function ActionButton({
     })
   }
 
-  const onEnter = () => {
-    if (!animate) return
-    gsap.to(fillRef.current, { yPercent: 0, duration: 0.55, ease: 'expo.out' })
-    gsap.to(labelRef.current, { color: fillText[variant], duration: 0.35 })
-  }
-
+  /* El barrido lo hace CSS (ver `fillRef` abajo). GSAP solo devuelve el boton
+     a su sitio tras la atraccion magnetica. */
   const onLeave = () => {
     if (!animate) return
     gsap.to(ref.current, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.45)' })
-    gsap.to(fillRef.current, { yPercent: 101, duration: 0.45, ease: 'power3.inOut' })
-    gsap.to(labelRef.current, { color: '', duration: 0.3 })
   }
 
   const handleClick = (e: MouseEvent) => {
@@ -91,7 +86,6 @@ export function ActionButton({
     ref: ref as never,
     className: `group relative isolate inline-flex items-center gap-3 overflow-hidden rounded-full border px-7 py-4 type-mono select-none transition-colors duration-300 will-change-transform ${variants[variant]} ${className}`,
     onMouseMove: onMove,
-    onMouseEnter: onEnter,
     onMouseLeave: onLeave,
     onClick: handleClick,
   }
@@ -101,10 +95,16 @@ export function ActionButton({
       <span
         ref={fillRef}
         aria-hidden
-        className="absolute inset-0 -z-10 translate-y-full"
-        style={{ backgroundColor: fillColor[variant] }}
+        className={`absolute inset-0 -z-10 translate-y-full ${fillClass[variant]} ${
+          animate
+            ? 'transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0'
+            : ''
+        }`}
       />
-      <span ref={labelRef} className="relative flex items-center gap-3">
+      <span
+        ref={labelRef}
+        className={`relative flex items-center gap-3 transition-colors duration-300 ${animate ? HOVER_TEXT : ''}`}
+      >
         {children}
         {arrow && (
           <svg
