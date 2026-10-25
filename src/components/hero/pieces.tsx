@@ -1,21 +1,81 @@
-import { RoundedBox } from '@react-three/drei'
+import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
-import type { Group } from 'three'
+import { useMemo, useRef } from 'react'
+import { Box3, Vector3, type Group, type Mesh, type MeshStandardMaterial } from 'three'
+import { asset } from '@/lib/asset'
 import { PALETTE } from './palette'
 
 /* ===========================================================================
-   PIEZAS 3D
+   PIEZAS 3D DEL HERO
    ---------------------------------------------------------------------------
-   Todas las piezas se construyen con geometria primitiva (cubos redondeados,
-   icosaedros, cilindros, conos y esferas) con acabado metalico, de modo que
-   el hero no depende de ningun archivo .glb externo.
+   Modelos .glb servidos desde public/models/, comprimidos con meshopt (su
+   decodificador viene dentro de three, no se descarga nada de un CDN).
 
-   Si mas adelante se consiguen modelos reales, basta sustituir el contenido
-   de cada funcion por un <primitive object={gltf.scene} /> manteniendo la
-   misma interfaz de props.
+   Los originales, sin optimizar, viven fuera del repositorio en models-src/.
+   Para regenerarlos: npm run models  (ver scripts/optimize-models.mjs)
    =========================================================================== */
 
+const MODELS = {
+  d20: '/models/d20.glb',
+  die: '/models/die.glb',
+  card: '/models/card.glb',
+  token: '/models/token.glb',
+  pawn: '/models/pawn.glb',
+} as const
+
+/**
+ * Carga un modelo y lo deja centrado en el origen y escalado para que su lado
+ * mayor mida `size`.
+ *
+ * Es lo que permite mezclar modelos de procedencias distintas: cada uno viene
+ * con su propia escala y su propio pivote (uno mide 2 unidades, otro 115), y
+ * sin normalizar habria que ajustar cada pieza a mano.
+ */
+interface ModelOptions {
+  /** Recolorea la pieza con un color de la paleta. Solo para los modelos que
+   *  vienen con color plano, sin textura. */
+  tint?: string
+}
+
+function useNormalizedModel(url: string, size: number, { tint }: ModelOptions = {}) {
+  const { scene } = useGLTF(asset(url))
+
+  return useMemo(() => {
+    const model = scene.clone(true)
+
+    if (tint) {
+      model.traverse((o) => {
+        const mesh = o as Mesh
+        if (!mesh.isMesh || !mesh.visible) return
+        // El material se clona: useGLTF cachea la escena original y clone()
+        // comparte los materiales con ella
+        const mat = (
+          Array.isArray(mesh.material) ? mesh.material[0] : mesh.material
+        ).clone() as MeshStandardMaterial
+        mat.color.set(tint)
+        mat.envMapIntensity = 1.4
+        mesh.material = mat
+      })
+    }
+
+    // La caja se mide despues de ocultar piezas: asi el tamano corresponde a
+    // lo que se ve de verdad
+    // setFromObject actualiza las matrices de mundo por su cuenta: medir malla
+    // a malla con expandByObject daba cajas erroneas, porque los modelos traen
+    // transformaciones en los nodos padre (giros de eje, escalas, offsets)
+    model.updateWorldMatrix(true, true)
+    const box = new Box3().setFromObject(model)
+
+    const dims = box.getSize(new Vector3())
+    const center = box.getCenter(new Vector3())
+    const scale = size / Math.max(dims.x, dims.y, dims.z)
+
+    model.scale.setScalar(scale)
+    model.position.set(-center.x * scale, -center.y * scale, -center.z * scale)
+
+    return model
+  }, [scene, size, tint])
+}
 
 interface FloatProps {
   position: [number, number, number]
@@ -63,127 +123,33 @@ export function Floating({
   )
 }
 
-/** Dado de 20 caras: icosaedro metalico dorado. */
-export function D20({ color = PALETTE.gold }: { color?: string }) {
-  return (
-    <mesh castShadow>
-      <icosahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial color={color} metalness={0.82} roughness={0.16} envMapIntensity={1.5} />
-    </mesh>
-  )
+/* ---------------------------------------------------------------------------
+   Una funcion por pieza. El tamano objetivo iguala el que tenian las figuras
+   geometricas anteriores, para no tener que recolocar toda la composicion.
+   --------------------------------------------------------------------------- */
+
+export function D20() {
+  return <primitive object={useNormalizedModel(MODELS.d20, 2)} />
 }
 
-/** Dado clasico de seis caras con los puntos marcados en relieve. */
-export function Die({ color = PALETTE.ember }: { color?: string }) {
-  const pip = (x: number, y: number, z: number, rx = 0, ry = 0) => (
-    <mesh key={`${x}${y}${z}${rx}${ry}`} position={[x, y, z]} rotation={[rx, ry, 0]}>
-      <cylinderGeometry args={[0.11, 0.11, 0.04, 16]} />
-      <meshStandardMaterial color={PALETTE.cream} metalness={0.3} roughness={0.45} />
-    </mesh>
-  )
-
-  const f = 0.51
-
-  return (
-    <group>
-      <RoundedBox args={[1, 1, 1]} radius={0.16} smoothness={4} castShadow>
-        <meshStandardMaterial color={color} metalness={0.4} roughness={0.28} envMapIntensity={1.3} />
-      </RoundedBox>
-      {/* cara 1 (arriba) */}
-      {pip(0, f, 0)}
-      {/* cara 2 (frente) */}
-      {pip(-0.22, 0.22, f, Math.PI / 2)}
-      {pip(0.22, -0.22, f, Math.PI / 2)}
-      {/* cara 3 (lateral derecho) */}
-      {pip(f, 0.24, 0.24, 0, Math.PI / 2)}
-      {pip(f, 0, 0, 0, Math.PI / 2)}
-      {pip(f, -0.24, -0.24, 0, Math.PI / 2)}
-    </group>
-  )
+export function Die() {
+  return <primitive object={useNormalizedModel(MODELS.die, 1.5)} />
 }
 
-/** Meeple: silueta reconocible hecha con esfera, cilindro y cono. */
-export function Meeple({ color = PALETTE.cobalt }: { color?: string }) {
-  const mat = <meshStandardMaterial color={color} metalness={0.5} roughness={0.32} envMapIntensity={1.3} />
-  return (
-    <group>
-      <mesh position={[0, 0.62, 0]}>
-        <sphereGeometry args={[0.3, 24, 24]} />
-        {mat}
-      </mesh>
-      <mesh position={[0, 0.08, 0]}>
-        <cylinderGeometry args={[0.2, 0.42, 0.78, 20]} />
-        {mat}
-      </mesh>
-      <mesh position={[0, -0.34, 0]}>
-        <cylinderGeometry args={[0.46, 0.5, 0.12, 20]} />
-        {mat}
-      </mesh>
-      {/* brazos */}
-      <mesh position={[-0.36, 0.22, 0]} rotation={[0, 0, 0.9]}>
-        <capsuleGeometry args={[0.1, 0.34, 4, 10]} />
-        {mat}
-      </mesh>
-      <mesh position={[0.36, 0.22, 0]} rotation={[0, 0, -0.9]}>
-        <capsuleGeometry args={[0.1, 0.34, 4, 10]} />
-        {mat}
-      </mesh>
-    </group>
-  )
+export function Card() {
+  return <primitive object={useNormalizedModel(MODELS.card, 2)} />
 }
 
-/** Carta: caja muy delgada con borde redondeado. */
-export function Card({ color = PALETTE.cream, accent = PALETTE.ember }: { color?: string; accent?: string }) {
-  return (
-    <group>
-      <RoundedBox args={[1.25, 1.78, 0.045]} radius={0.08} smoothness={3} castShadow>
-        <meshStandardMaterial color={color} metalness={0.2} roughness={0.5} />
-      </RoundedBox>
-      <mesh position={[0, 0, 0.028]}>
-        <circleGeometry args={[0.38, 32]} />
-        <meshStandardMaterial color={accent} metalness={0.4} roughness={0.35} />
-      </mesh>
-    </group>
-  )
+/* La ficha venia en blanco hueso, invisible sobre el fondo */
+export function Token() {
+  return <primitive object={useNormalizedModel(MODELS.token, 1.4, { tint: PALETTE.gold })} />
 }
 
-/** Ficha / token circular. */
-export function Token({ color = PALETTE.pine }: { color?: string }) {
-  return (
-    <group>
-      <mesh castShadow>
-        <cylinderGeometry args={[0.62, 0.62, 0.14, 40]} />
-        <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} envMapIntensity={1.4} />
-      </mesh>
-      <mesh position={[0, 0.08, 0]}>
-        <torusGeometry args={[0.4, 0.045, 12, 40]} />
-        <meshStandardMaterial color={PALETTE.cream} metalness={0.7} roughness={0.3} />
-      </mesh>
-    </group>
-  )
+export function Pawn() {
+  return <primitive object={useNormalizedModel(MODELS.pawn, 1.8)} />
 }
 
-/** Peon de ajedrez. */
-export function Pawn({ color = PALETTE.ink }: { color?: string }) {
-  const mat = <meshStandardMaterial color={color} metalness={0.88} roughness={0.14} envMapIntensity={1.8} />
-  return (
-    <group>
-      <mesh position={[0, 0.66, 0]}>
-        <sphereGeometry args={[0.27, 24, 24]} />
-        {mat}
-      </mesh>
-      <mesh position={[0, 0.36, 0]}>
-        <cylinderGeometry args={[0.3, 0.18, 0.14, 20]} />
-        {mat}
-      </mesh>
-      <mesh position={[0, 0.02, 0]}>
-        <cylinderGeometry args={[0.15, 0.26, 0.6, 20]} />
-        {mat}
-      </mesh>
-      <mesh position={[0, -0.34, 0]}>
-        <cylinderGeometry args={[0.42, 0.46, 0.14, 24]} />
-        {mat}
-      </mesh>
-    </group>
-  )
+/* Se piden en cuanto se monta la escena, para que no aparezcan de una en una */
+for (const url of Object.values(MODELS)) {
+  useGLTF.preload(asset(url))
 }

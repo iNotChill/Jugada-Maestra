@@ -1,9 +1,8 @@
 import { Environment, Lightformer } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useRef, type ReactNode, type RefObject } from 'react'
+import { Suspense, useRef, type ReactNode, type RefObject } from 'react'
 import type { Group } from 'three'
-import { PALETTE } from './palette'
-import { Card, D20, Die, Floating, Meeple, Pawn, Token } from './pieces'
+import { Card, D20, Die, Floating, Pawn, Token } from './pieces'
 
 interface SceneProps {
   /** Progreso de scroll del hero (0 arriba → 1 fuera de pantalla) */
@@ -66,7 +65,7 @@ const DESKTOP_ANCHORS: PieceAnchor[] = [
     phase: 0.4,
     spin: [-0.18, 0.24, 0],
     rotation: [1.4, 0.4, -0.2],
-    node: <Token color={PALETTE.gold} />,
+    node: <Token />,
   },
   {
     id: 'd20',
@@ -104,7 +103,7 @@ const DESKTOP_ANCHORS: PieceAnchor[] = [
     phase: 4,
     spin: [0.1, 0.3, 0.1],
     rotation: [1.3, 0, 0.5],
-    node: <Token color={PALETTE.ember} />,
+    node: <Token />,
   },
   {
     id: 'card-r',
@@ -117,7 +116,7 @@ const DESKTOP_ANCHORS: PieceAnchor[] = [
     phase: 1.9,
     spin: [0.03, -0.08, 0.02],
     rotation: [-0.15, -0.5, -0.3],
-    node: <Card color={PALETTE.cream} accent={PALETTE.cobalt} />,
+    node: <Card />,
   },
   {
     id: 'pawn',
@@ -131,19 +130,6 @@ const DESKTOP_ANCHORS: PieceAnchor[] = [
     spin: [0, -0.14, 0],
     rotation: [0, -0.3, 0.1],
     node: <Pawn />,
-  },
-  {
-    id: 'meeple',
-    fx: 0.88,
-    fy: -0.6,
-    z: 1.2,
-    scale: 0.95,
-    amp: 0.12,
-    speed: 0.5,
-    phase: 2.6,
-    spin: [0, 0.1, 0],
-    rotation: [0, 0.4, -0.12],
-    node: <Meeple />,
   },
 ]
 
@@ -184,7 +170,7 @@ const COMPACT_ANCHORS: PieceAnchor[] = [
     phase: 2.2,
     spin: [0.2, 0.2, 0.1],
     rotation: [1.2, 0.2, 0.3],
-    node: <Token color={PALETTE.gold} />,
+    node: <Token />,
   },
 ]
 
@@ -273,9 +259,12 @@ export default function HeroScene({ progress, dense, paused }: SceneProps) {
         <Lightformer form="circle" intensity={2} color="#ffffff" scale={4} position={[0, -5, 3]} />
       </Environment>
 
-      <Rig progress={progress}>
-        <Composition dense={dense} />
-      </Rig>
+      {/* useGLTF suspende mientras descarga: el limite va DENTRO del canvas */}
+      <Suspense fallback={null}>
+        <Rig progress={progress}>
+          <Composition dense={dense} />
+        </Rig>
+      </Suspense>
     </Canvas>
   )
 }

@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Modelos 3D originales sin optimizar (29 MB): no entran en el repo.
+# Los .glb servidos estan en public/models/, generados con 'npm run models'.
+models-src

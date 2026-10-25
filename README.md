@@ -75,7 +75,7 @@ La información no se presenta: **se descubre mientras haces scroll.**
 
 | | |
 | :-- | :-- |
-| 🎲 **Hero en 3D** | Dado, D20, meeple, peón, carta y fichas flotando, con parallax de cursor y deriva por scroll. Todo con geometría primitiva: **cero modelos externos** |
+| 🎲 **Hero en 3D** | D20, dados, carta, peón y fichas flotando, con parallax de cursor y deriva por scroll. Modelos reales optimizados a **316 KB en total** |
 | 🃏 **Catálogo interactivo** | Índice editorial en desktop con lámina que sigue al cursor; carrusel con snap en móvil. Filtros por categoría derivados de los datos |
 | 📖 **Relato con pin** | "Cómo funciona" fija la sección y cambia de escena en cada etapa mientras haces scroll |
 | 🎨 **Sistema visual propio** | Crema y marfil de base, bermellón como acción, amarillo de acento. Dos familias tipográficas, ni una más |
@@ -159,7 +159,7 @@ src/
 │   ├── Hero.tsx            titular + composición 3D + datos del evento
 │   ├── hero/
 │   │   ├── HeroScene.tsx   canvas, luces, anclaje de piezas al viewport
-│   │   └── pieces.tsx      dado, D20, meeple, peón, carta y ficha
+│   │   └── pieces.tsx      carga y normaliza los modelos .glb
 │   ├── GameExplorer.tsx    catálogo: índice en desktop, carrusel en móvil
 │   ├── GameCard.tsx        fila o tarjeta, según el layout
 │   ├── GameModal.tsx       ficha completa del juego
@@ -216,8 +216,12 @@ Cada una tiene un porqué. Ninguna está de adorno:
   pinta antes de que empiece a descargarse.
 - El canvas **deja de renderizar** cuando el hero sale de pantalla
   (`IntersectionObserver` → `frameloop="never"`).
-- Las piezas son geometría primitiva con material metálico y el mapa de entorno
-  se genera en escena: **no se descarga ningún HDR ni modelo externo**.
+- Los modelos venían de escaneo, con hasta 438.000 triángulos para piezas que
+  en pantalla ocupan 100 px: `npm run models` los simplifica y comprime con
+  meshopt, de **28,5 MB a 316 KB** (99% menos). El decodificador de meshopt va
+  dentro de three, así que no se descarga nada de un CDN.
+- El mapa de entorno que da el reflejo metálico se genera en la propia escena:
+  **no se descarga ningún HDR**.
 - Las cintas infinitas son CSS puro, sin coste por frame.
 - Imágenes con `loading="lazy"` y `decoding="async"`.
 
